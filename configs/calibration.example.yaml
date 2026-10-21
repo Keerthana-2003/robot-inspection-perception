@@ -1,0 +1,14 @@
+# Produced by perception.calibration (camera checkerboard + LiDAR-camera correspondences)
+camera:
+  fx: 912.4
+  fy: 911.8
+  cx: 641.2
+  cy: 362.7
+  width: 1280
+  height: 720
+# camera <- lidar, row-major 4x4
+T_cam_lidar:
+  - [0.0, -1.0, 0.0, 0.02]
+  - [0.0, 0.0, -1.0, -0.18]
+  - [1.0, 0.0, 0.0, -0.05]
+  - [0.0, 0.0, 0.0, 1.0]

@@ -1,0 +1,18 @@
+# ROS 2 Jazzy image running the inspection node on a robot.
+#   docker build -f docker/Dockerfile.ros2 -t inspection-ros2 .
+#   docker run --net=host -v $PWD/models:/models -v $PWD/configs:/config inspection-ros2 \
+#     ros2 launch inspection_perception_ros inspection.launch.py model:=/models/best.onnx calibration:=/config/calibration.yaml
+FROM ros:jazzy-ros-base
+SHELL ["/bin/bash", "-c"]
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      python3-pip python3-numpy python3-scipy python3-opencv python3-yaml && rm -rf /var/lib/apt/lists/*
+RUN pip3 install --no-cache-dir --break-system-packages onnxruntime
+WORKDIR /ws
+COPY pyproject.toml /opt/perception/pyproject.toml
+COPY perception /opt/perception/perception
+RUN pip3 install --no-cache-dir --break-system-packages --no-deps /opt/perception
+COPY ros2/inspection_perception_ros src/inspection_perception_ros
+RUN source /opt/ros/jazzy/setup.bash && colcon build --packages-select inspection_perception_ros
+RUN echo "source /ws/install/setup.bash" >> /root/.bashrc
+ENTRYPOINT ["/bin/bash", "-c", "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && exec \"$@\"", "--"]
+CMD ["ros2", "launch", "inspection_perception_ros", "inspection.launch.py"]

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "robot-inspection-perception"
+version = "0.1.0"
+description = "Perception for inspection robots: detection, segmentation, tracking, LiDAR/depth fusion, anomaly detection, thermal hotspots, PTZ active perception, edge deployment."
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "scipy>=1.10", "opencv-python-headless>=4.8", "onnxruntime>=1.17", "pyyaml>=6"]
+
+[project.optional-dependencies]
+train = ["ultralytics>=8.3", "torch>=2.2", "torchvision>=0.17", "transformers>=4.40", "onnx>=1.15", "onnxslim"]
+dev = ["pytest>=8", "ruff==0.15.0"]
+
+[tool.setuptools]
+packages = ["perception"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+extend-exclude = ["notebooks"]

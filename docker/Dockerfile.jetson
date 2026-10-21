@@ -1,0 +1,17 @@
+# NVIDIA Jetson (JetPack 6, L4T r36) image. Build ON the Jetson:
+#   docker build -f docker/Dockerfile.jetson -t inspection-jetson .
+#   docker run --runtime nvidia -v $PWD/models:/models inspection-jetson --video /data/site.mp4 --weights /models/best.onnx
+# TensorRT engines must be built on the target device: run scripts/export_and_benchmark.py on the Jetson.
+# Not exercised in CI (needs Jetson hardware).
+ARG BASE=nvcr.io/nvidia/l4t-jetpack:r36.3.0
+FROM ${BASE}
+# GPU-enabled ONNX Runtime wheel for JetPack 6 from the Jetson AI Lab index
+ARG PIP_INDEX=https://pypi.jetson-ai-lab.dev/jp6/cu122
+RUN apt-get update && apt-get install -y --no-install-recommends python3-pip python3-opencv && rm -rf /var/lib/apt/lists/*
+RUN pip3 install --no-cache-dir --extra-index-url ${PIP_INDEX} onnxruntime-gpu numpy scipy pyyaml
+WORKDIR /app
+COPY pyproject.toml ./
+COPY perception ./perception
+COPY scripts ./scripts
+RUN pip3 install --no-cache-dir --no-deps .
+ENTRYPOINT ["python3", "scripts/run_video.py"]
